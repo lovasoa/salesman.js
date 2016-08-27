@@ -1,3 +1,13 @@
+/**
+ * @module
+ * @author Ophir LOJKINE
+ * salesman npm module
+ **/
+
+
+/**
+ * @private
+ */
 function Path(points) {
   this.points = points;
   this.order = new Array(points.length);
@@ -37,8 +47,23 @@ Path.prototype.randomPos = function() {
  *  Given a list of points and the distances between each pair of points,
  *  what is the shortest possible route that visits each point exactly
  *  once and returns to the origin point?
+ *
+ * @param {Point[]} points The points that the path will have to visit.
+ * @param {Number} [temp_coeff=0.999] changes the convergence speed of the algorithm: the closer to 1, the slower the algorithm and the better the solutions.
+ * @param {Function} [callback=] An optional callback to be called after each iteration.
+ *
+ * @returns {Number[]} An array of indexes in the original array. Indicates in which order the different points are visited.
+ *
+ * @example
+ * var points = [
+ *       new salesman.Point(2,3)
+ *       //other points
+ *     ];
+ * var solution = salesman.solve(points);
+ * var ordered_points = solution.map(i => points[i]);
+ * // ordered_points now contains the points, in the order they ought to be visited.
  **/
-Path.find = function(points, temp_coeff, callback) {
+function solve(points, temp_coeff, callback) {
   var path = new Path(points);
   if (!temp_coeff)
     temp_coeff = 1 - Math.exp(-7 - Math.min(points.length,1e6)/1e5);
@@ -55,8 +80,11 @@ Path.find = function(points, temp_coeff, callback) {
 
 /**
  * Represents a point in two dimensions.
+ * @class
+ * @param {Number} x abscissa
+ * @param {Number} y ordinate
  */
-Path.Point = function(x, y) {
+function Point(x, y) {
   this.x = x;
   this.y = y;
 };
@@ -66,16 +94,7 @@ function distance(p, q) {
   return Math.sqrt(dx*dx + dy*dy);
 }
 
-module.exports = Path;
-
-////////////////
-function cb(){
-  this.start = this.start || Date.now();
-  this.x = this.x | 0;
-  this.x ++;
-  if(this.x % 1e6 == 0)
-    console.log("ops/s: %d", 1000 * this.x / (Date.now() - this.start));
-}
-
-for(var a=[]; a.length < 1e6; a.push({x:Math.random(), y:Math.random()}));
-var res = Path.find(a, 0.99999, cb);
+module.exports = {
+  "solve": solve,
+  "Point": Point
+};
