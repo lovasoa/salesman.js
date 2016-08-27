@@ -2,6 +2,8 @@
  * @module
  * @author Ophir LOJKINE
  * salesman npm module
+ *
+ * Good heuristic for the traveling salesman problem using simulated annealing.
  **/
 
 
