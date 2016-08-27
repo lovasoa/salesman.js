@@ -1,0 +1,32 @@
+{
+  "name": "salesman.js",
+  "version": "1.0.0",
+  "description": "Solves the traveling salesman problem using simulated annealing.",
+  "main": "salesman.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+    "prepublish": "node salesman.js && node node_modules/jsdoc-to-markdown/bin/cli.js --src salesman.js > README.md"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/lovasoa/salesman.js.git"
+  },
+  "keywords": [
+    "traveling",
+    "salesman",
+    "simulated",
+    "annealing",
+    "algorithm",
+    "path",
+    "points"
+  ],
+  "author": "Ophir LOJKINE",
+  "license": "Apache v2",
+  "bugs": {
+    "url": "https://github.com/lovasoa/salesman.js/issues"
+  },
+  "homepage": "https://github.com/lovasoa/salesman.js",
+  "devDependencies": {
+    "jsdoc-to-markdown": "1.3"
+  }
+}
