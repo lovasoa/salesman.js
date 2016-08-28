@@ -4,6 +4,7 @@
  * salesman npm module
  *
  * Good heuristic for the traveling salesman problem using simulated annealing.
+ * @see {@link https://lovasoa.github.io/salesman.js/|demo}
  **/
 
 
@@ -14,6 +15,10 @@ function Path(points) {
   this.points = points;
   this.order = new Array(points.length);
   for(var i=0; i<points.length; i++) this.order[i] = i;
+  this.distances = new Array(points.length * points.length);
+  for(var i=0; i<points.length; i++)
+    for(var j=0; j<points.length; j++)
+      this.distances[j + i*points.length] = distance(points[i], points[j]);
 }
 Path.prototype.change = function(temp) {
   var i = this.randomPos(), j = this.randomPos();
@@ -25,7 +30,7 @@ Path.prototype.change = function(temp) {
 Path.prototype.size = function() {
   var s = 0;
   for (var i=0; i<this.points.length; i++) {
-    s += distance(this.access(i), this.access(i+1));
+    s += this.distance(i, ((i+1)%this.points.length));
   }
   return s;
 };
@@ -59,7 +64,7 @@ Path.prototype.access = function(i) {
   return this.points[this.order[this.index(i)]];
 };
 Path.prototype.distance = function(i, j) {
-  return distance(this.access(i), this.access(j));
+  return this.distances[this.order[i] * this.points.length + this.order[j]];
 };
 Path.prototype.randomPos = function() {
   return Math.floor(Math.random() * this.points.length);
