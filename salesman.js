@@ -19,26 +19,47 @@ Path.prototype.change = function(temp) {
   var i = this.randomPos(), j = this.randomPos();
   var delta = this.delta_distance(i, j);
   if (delta < 0 || Math.random() < Math.exp(-delta / temp)) {
-    var tmp = this.order[i];
-    this.order[i] = this.order[j];
-    this.order[j] = tmp;
+    this.swap(i,j);
   }
 };
+Path.prototype.size = function() {
+  var s = 0;
+  for (var i=0; i<this.points.length; i++) {
+    s += distance(this.access(i), this.access(i+1));
+  }
+  return s;
+};
+Path.prototype.swap = function(i,j) {
+  var tmp = this.order[i];
+  this.order[i] = this.order[j];
+  this.order[j] = tmp;
+};
 Path.prototype.delta_distance = function(i, j) {
-  return (
-       distance(this.access(j-1), this.access(i  ))
-     + distance(this.access(i  ), this.access(j+1))
-     + distance(this.access(i-1), this.access(j  ))
-     + distance(this.access(j  ), this.access(i+1))
-     - distance(this.access(j-1), this.access(j  ))
-     - distance(this.access(j  ), this.access(j+1))
-     - distance(this.access(i-1), this.access(i  ))
-     - distance(this.access(i  ), this.access(i+1))
-  );
+  var jm1 = this.index(j-1),
+      jp1 = this.index(j+1),
+      im1 = this.index(i-1),
+      ip1 = this.index(i+1);
+  var s = 
+      this.distance(jm1, i  )
+    + this.distance(i  , jp1)
+    + this.distance(im1, j  )
+    + this.distance(j  , ip1)
+    - this.distance(im1, i  )
+    - this.distance(i  , ip1)
+    - this.distance(jm1, j  )
+    - this.distance(j  , jp1);
+  if (jm1 === i || jp1 === i)
+    s += 2*this.distance(i,j); 
+  return s;
+};
+Path.prototype.index = function(i) {
+  return (i + this.points.length) % this.points.length;
 };
 Path.prototype.access = function(i) {
-  i = (i + this.points.length) % this.points.length;
-  return this.points[this.order[i]];
+  return this.points[this.order[this.index(i)]];
+};
+Path.prototype.distance = function(i, j) {
+  return distance(this.access(i), this.access(j));
 };
 Path.prototype.randomPos = function() {
   return Math.floor(Math.random() * this.points.length);
@@ -68,11 +89,11 @@ Path.prototype.randomPos = function() {
 function solve(points, temp_coeff, callback) {
   var path = new Path(points);
   if (!temp_coeff)
-    temp_coeff = 1 - Math.exp(-7 - Math.min(points.length,1e6)/1e5);
+    temp_coeff = 1 - Math.exp(-10 - Math.min(points.length,1e6)/1e5);
   var has_callback = typeof(callback) === "function";
 
   for (var temperature = 100 * distance(path.access(0), path.access(1));
-           temperature > 1e-3;
+           temperature > 1e-5;
            temperature *= temp_coeff) {
     path.change(temperature);
     if (has_callback) callback(path.order);
@@ -96,7 +117,9 @@ function distance(p, q) {
   return Math.sqrt(dx*dx + dy*dy);
 }
 
-module.exports = {
-  "solve": solve,
-  "Point": Point
-};
+if (typeof module === "object") {
+  module.exports = {
+    "solve": solve,
+    "Point": Point
+  };
+}
