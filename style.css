@@ -1,0 +1,20 @@
+.points > circle {
+  stroke: red;
+  stroke-width: 2px;
+  fill: #f98;
+  opacity: .75;
+}
+
+.points > circle:hover {
+  opacity: 1;
+}
+
+.graph {
+  border: 1px solid black;
+  border-radius: 7px;
+}
+
+.path > line {
+  stroke: black;
+  stroke-dasharray:4,10;
+}
