@@ -4,6 +4,7 @@
  * salesman npm module
  *
  * Good heuristic for the traveling salesman problem using simulated annealing.
+ * @see {@link https://lovasoa.github.io/salesman.js/|demo}
  **/
 
 

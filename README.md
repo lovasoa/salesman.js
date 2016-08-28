@@ -1,6 +1,7 @@
 <a name="module_salesman"></a>
 
 ## salesman
+**See**: [demo](https://lovasoa.github.io/salesman.js/)  
 **Author:** Ophir LOJKINE
 salesman npm module
 
