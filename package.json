@@ -1,11 +1,11 @@
 {
   "name": "salesman.js",
-  "version": "2.0.2",
+  "version": "2.0.3",
   "description": "Solves the traveling salesman problem using simulated annealing.",
   "main": "salesman.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "prepublish": "node salesman.js && node node_modules/jsdoc-to-markdown/bin/cli.js --src salesman.js > README.md"
+    "test": "node test.js",
+    "prepare": "node salesman.js && node node_modules/jsdoc-to-markdown/bin/cli.js --src salesman.js > README.md"
   },
   "repository": {
     "type": "git",
