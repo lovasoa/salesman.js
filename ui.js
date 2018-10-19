@@ -8,11 +8,6 @@ var Canvas = React.createClass({
     };
   },
   componentDidMount: function() {
-    this.worker = new Worker("webworker.js");
-    this.worker.onmessage = e => {
-      this.setState({order: e.data});
-    };
-
     var pts = new Array(30);
     for(var i=0; i<pts.length; i++) pts[i] = {
       id: this.generateId(),
@@ -24,10 +19,18 @@ var Canvas = React.createClass({
   componentWillUnmount: function() {
     this.worker.terminate();
   },
+  resetWorker: function() {
+    if (this.worker) this.worker.terminate();
+    this.worker = new Worker("webworker.js");
+    this.worker.onmessage = e => {
+      this.setState({order: e.data});
+    };
+  },
   generateId: function(){
     return Math.random().toString(36).slice(2);
   },
   setPoints : function(pts) {
+    this.resetWorker();
     this.setState({points:pts, order:[]});
     this.worker.postMessage(pts);
   },
