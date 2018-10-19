@@ -66,8 +66,9 @@ Path.prototype.access = function(i) {
 Path.prototype.distance = function(i, j) {
   return this.distances[this.order[i] * this.points.length + this.order[j]];
 };
+// Random index between 1 and the last position in the array of points
 Path.prototype.randomPos = function() {
-  return Math.floor(Math.random() * this.points.length);
+  return 1 + Math.floor(Math.random() * (this.points.length - 1));
 };
 
 /**
@@ -93,6 +94,7 @@ Path.prototype.randomPos = function() {
  **/
 function solve(points, temp_coeff, callback) {
   var path = new Path(points);
+  if (points.length < 2) return path.order; // There is nothing to optimize
   if (!temp_coeff)
     temp_coeff = 1 - Math.exp(-10 - Math.min(points.length,1e6)/1e5);
   var has_callback = typeof(callback) === "function";
