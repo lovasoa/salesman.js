@@ -100,7 +100,7 @@ function solve(points, temp_coeff, callback) {
   var has_callback = typeof(callback) === "function";
 
   for (var temperature = 100 * distance(path.access(0), path.access(1));
-           temperature > 1e-5;
+           temperature > 1e-6;
            temperature *= temp_coeff) {
     path.change(temperature);
     if (has_callback) callback(path.order);
