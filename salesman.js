@@ -120,9 +120,9 @@ Path.prototype.access = function(i) {
 };
 /**
  * Access the cached distance between two points, by their indices.
- * @param {Number} i The first index as an integer
- * @param {Number} j The second index as an integer
- * @returns {Number} The distance between point i and point j.
+ * @param {number} i The first index as an integer
+ * @param {number} j The second index as an integer
+ * @returns {number} The distance between point i and point j.
  */
 Path.prototype.distance = function(i, j) {
   if (i === j) return 0; // Identity.
@@ -135,7 +135,7 @@ Path.prototype.distance = function(i, j) {
 };
 /**
  * Retrieve a random index between 1 and the last position in the array of points.
- * @returns {Number} A random index.
+ * @returns {number} A random index.
  */
 Path.prototype.randomPos = function() {
   return 1 + Math.floor(Math.random() * (this.points.length - 1));
@@ -144,8 +144,8 @@ Path.prototype.randomPos = function() {
 /**
  * Represents a point in two dimensions. Used as the input for `solve`.
  * @class
- * @param {Number} x abscissa
- * @param {Number} y ordinate
+ * @param {number} x abscissa
+ * @param {number} y ordinate
  */
 function Point(x, y) {
   this.x = x;
@@ -159,11 +159,11 @@ function Point(x, y) {
  *  once and returns to the origin point?
  *
  * @param {Point[]} points The points that the path will have to visit.
- * @param {Number} [temp_coeff=0.999] changes the convergence speed of the algorithm. Smaller values (0.9) work faster but give poorer solutions, whereas values closer to 1 (0.99999) work slower, but give better solutions.
+ * @param {number} [temp_coeff=0.999] changes the convergence speed of the algorithm. Smaller values (0.9) work faster but give poorer solutions, whereas values closer to 1 (0.99999) work slower, but give better solutions.
  * @param {Function} [callback=undefined] An optional callback to be called after each iteration.
- * @param {Function} [callback=euclidean] An optional argument to specify how distances are calculated. The function takes two Point objects as arguments and returns a Number for distance. Defaults to simple Euclidean distance calculation.
+ * @param {Function} [callback=euclidean] An optional argument to specify how distances are calculated. The function takes two Point objects as arguments and returns a number for distance. Defaults to simple Euclidean distance calculation.
  *
- * @returns {Number[]} An array of indexes in the original array. Indicates in which order the different points are visited.
+ * @returns {number[]} An array of indexes in the original array. Indicates in which order the different points are visited.
  *
  * @example
  * var points = [
@@ -201,7 +201,7 @@ function solve(points, temp_coeff = 0.999, callback, distance = euclidean) {
  * A simple distance function, to use as the default.
  * @param {Point} p 
  * @param {Point} q 
- * @returns {Number} The Euclidean distance between p and q
+ * @returns {number} The Euclidean distance between p and q
  */
 function euclidean(p, q) {
   var dx = p.x - q.x, dy = p.y - q.y;
