@@ -10,13 +10,13 @@
 
 
 /**
- * @private
  * 
  * Represents a path between points.
  * Includes an internal order for those points,
  * along with an array which maintains a record of distances between points.
  * @param {Points[]} points The points in the path.
  * @param {Function} distanceFunc The function to use to calculate the distance between two points.
+ * @private
  */
 function Path(points, distanceFunc) {
   this.points = points;
@@ -55,7 +55,7 @@ Path.prototype.initializeDistances = function() {
  * This random chance is based on how bad the move is,
  * as well as how early in the annealing process we are (the "temperature").
  * 
- * @param {*} temp The current temperature of the algorithm.
+ * @param {number} temp The current temperature of the algorithm.
  */
 Path.prototype.change = function(temp) {
   var i = this.randomPos(), j = this.randomPos();
@@ -66,8 +66,8 @@ Path.prototype.change = function(temp) {
 };
 /**
  * Swap two points in the path order by their indices.
- * @param {*} i The first index to swap.
- * @param {*} j The second index to swap.
+ * @param {number} i The first index to swap.
+ * @param {number} j The second index to swap.
  */
 Path.prototype.swap = function(i,j) {
   var tmp = this.order[i];
@@ -81,9 +81,9 @@ Path.prototype.swap = function(i,j) {
  * plus the distance between j and i's neighbors, minus the current distances.
  * 
  * If the value is negative, it would make the path shorter to swap the values.
- * @param {*} i The first index to compare.
- * @param {*} j The second index to compare.
- * @returns The change in path distance if i and j were swapped.
+ * @param {number} i The first index to compare.
+ * @param {number} j The second index to compare.
+ * @returns {number} The change in path distance if i and j were swapped.
  */
 Path.prototype.delta_distance = function(i, j) {
   var jm1 = this.index(j-1),
@@ -105,8 +105,10 @@ Path.prototype.delta_distance = function(i, j) {
 };
 /**
  * Get the ith point in the point array.
- * @param {*} i The index to retrieve.
- *   If i is greater than or less
+ * The path is cyclic, so i can be positive or negative,
+ * smaller or larger than the total number of points.
+ * @param {number} i The index to retrieve.
+ * @returns {number}
  */
 Path.prototype.index = function(i) {
   return (i + this.points.length) % this.points.length;
