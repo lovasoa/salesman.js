@@ -10,136 +10,151 @@
 
 
 /**
- * @private
  * 
  * Represents a path between points.
  * Includes an internal order for those points,
  * along with an array which maintains a record of distances between points.
  * @param {Points[]} points The points in the path.
  * @param {Function} distanceFunc The function to use to calculate the distance between two points.
+ * @private
  */
-function Path(points, distanceFunc) {
-  this.points = points;
-  this.distanceFunc = distanceFunc;
-  this.initializeOrder();
-  this.initializeDistances();
-}
-/**
- * Creates the default order for the points.
- */
-Path.prototype.initializeOrder = function() {
-  // A loop is about 3x faster than using a spread operator.
-  this.order = new Array(this.points.length);
-  for (var i = 0; i < this.order.length; i++) this.order[i] = i;
-}
-/**
- * Calculates the distance for all the points.
- */
-Path.prototype.initializeDistances = function() {
-  this.distances = new Array(this.points.length * this.points.length);
-  for(var i = 0; i < this.points.length; i++) {
-    // Optimization: Starting at i+1 avoids repeats and identity distances.
-    // We just need to make sure we don't access the empty cells later.
-    for(var j = i + 1; j < this.points.length; j++) {
-      this.distances[j + i * this.points.length] = this.distanceFunc(this.points[i], this.points[j]);
+class Path {
+  constructor(points, distanceFunc){
+    this.points = points;
+    this.distanceFunc = distanceFunc;
+    this.initializeOrder();
+    this.initializeDistances();
+  }
+
+  /**
+   * Creates the default order for the points.
+   */
+  initializeOrder() {
+    // A loop is about 3x faster than using a spread operator.
+    this.order = new Array(this.points.length);
+    for (let i = 0; i < this.order.length; i++) this.order[i] = i;
+  }
+
+  /**
+   * Calculates the distance for all the points.
+   */
+  initializeDistances() {
+    this.distances = new Array(this.points.length * this.points.length);
+    for(let i = 0; i < this.points.length; i++) {
+      // Optimization: Starting at i+1 avoids repeats and identity distances.
+      // We just need to make sure we don't access the empty cells later.
+      for(let j = i + 1; j < this.points.length; j++) {
+        this.distances[j + i * this.points.length] = this.distanceFunc(this.points[i], this.points[j]);
+      }
     }
   }
-};
-/**
- * Perform one iteration of the simulated annealing.
- * 
- * Choose two random points in the path, and calculate how much the path distance would change
- * if you swapped the two points. If it would make the path shorter, swap them.
- * 
- * If not, have a random chance to swap them anyway.
- * This random chance is based on how bad the move is,
- * as well as how early in the annealing process we are (the "temperature").
- * 
- * @param {*} temp The current temperature of the algorithm.
- */
-Path.prototype.change = function(temp) {
-  var i = this.randomPos(), j = this.randomPos();
-  var delta = this.delta_distance(i, j);
-  if (delta < 0 || Math.random() < Math.exp(-delta / temp)) {
-    this.swap(i,j);
+
+  /**
+   * Perform one iteration of the simulated annealing.
+   * 
+   * Choose two random points in the path, and calculate how much the path distance would change
+   * if you swapped the two points. If it would make the path shorter, swap them.
+   * 
+   * If not, have a random chance to swap them anyway.
+   * This random chance is based on how bad the move is,
+   * as well as how early in the annealing process we are (the "temperature").
+   * 
+   * @param {number} temp The current temperature of the algorithm.
+   */
+  change(temp) {
+    const i = this.randomPos(), j = this.randomPos();
+    const delta = this.delta_distance(i, j);
+    if (delta < 0 || Math.random() < Math.exp(-delta / temp)) {
+      this.swap(i,j);
+    }
   }
-};
-/**
- * Swap two points in the path order by their indices.
- * @param {*} i The first index to swap.
- * @param {*} j The second index to swap.
- */
-Path.prototype.swap = function(i,j) {
-  var tmp = this.order[i];
-  this.order[i] = this.order[j];
-  this.order[j] = tmp;
-};
-/**
- * Calculate the change in path distance if i and j were swapped.
- * 
- * Calculate the distance between i and j's neighbors,
- * plus the distance between j and i's neighbors, minus the current distances.
- * 
- * If the value is negative, it would make the path shorter to swap the values.
- * @param {*} i The first index to compare.
- * @param {*} j The second index to compare.
- * @returns The change in path distance if i and j were swapped.
- */
-Path.prototype.delta_distance = function(i, j) {
-  var jm1 = this.index(j-1),
-      jp1 = this.index(j+1),
-      im1 = this.index(i-1),
-      ip1 = this.index(i+1);
-  var s = 
-      this.distance(jm1, i  )
-    + this.distance(i  , jp1)
-    + this.distance(im1, j  )
-    + this.distance(j  , ip1)
-    - this.distance(im1, i  )
-    - this.distance(i  , ip1)
-    - this.distance(jm1, j  )
-    - this.distance(j  , jp1);
-  if (jm1 === i || jp1 === i)
-    s += 2*this.distance(i,j); 
-  return s;
-};
-/**
- * Get the ith point in the point array.
- * @param {*} i The index to retrieve.
- *   If i is greater than or less
- */
-Path.prototype.index = function(i) {
-  return (i + this.points.length) % this.points.length;
-};
-/**
- * Get the ith point in the path order.
- * @param {*} i The index to retrieve. 
- */
-Path.prototype.access = function(i) {
-  return this.points[this.order[this.index(i)]];
-};
-/**
- * Access the cached distance between two points, by their indices.
- * @param {number} i The first index as an integer
- * @param {number} j The second index as an integer
- * @returns {number} The distance between point i and point j.
- */
-Path.prototype.distance = function(i, j) {
-  if (i === j) return 0; // Identity.
 
-  // Ensure low is actually lower.
-  var low = this.order[i], high = this.order[j];
-  if (low > high) { low = this.order[j]; high = this.order[i]; }
+  /**
+   * Swap two points in the path order by their indices.
+   * @param {number} i The first index to swap.
+   * @param {number} j The second index to swap.
+   */
+  swap(i,j) {
+    const tmp = this.order[i];
+    this.order[i] = this.order[j];
+    this.order[j] = tmp;
+  };
 
-  return this.distances[low * this.points.length + high] || 0;
-};
-/**
- * Retrieve a random index between 1 and the last position in the array of points.
- * @returns {number} A random index.
- */
-Path.prototype.randomPos = function() {
-  return 1 + Math.floor(Math.random() * (this.points.length - 1));
-};
+  /**
+   * Calculate the change in path distance if i and j were swapped.
+   * 
+   * Calculate the distance between i and j's neighbors,
+   * plus the distance between j and i's neighbors, minus the current distances.
+   * 
+   * If the value is negative, it would make the path shorter to swap the values.
+   * @param {number} i The first index to compare.
+   * @param {number} j The second index to compare.
+   * @returns {number} The change in path distance if i and j were swapped.
+   */
+  delta_distance(i, j) {
+    const jm1 = this.index(j-1),
+        jp1 = this.index(j+1),
+        im1 = this.index(i-1),
+        ip1 = this.index(i+1);
+    let s = 
+        this.distance(jm1, i  )
+      + this.distance(i  , jp1)
+      + this.distance(im1, j  )
+      + this.distance(j  , ip1)
+      - this.distance(im1, i  )
+      - this.distance(i  , ip1)
+      - this.distance(jm1, j  )
+      - this.distance(j  , jp1);
+    if (jm1 === i || jp1 === i)
+      s += 2*this.distance(i,j); 
+    return s;
+  }
+
+  /**
+   * Get the ith point in the point array.
+   * The path is cyclic, so i can be positive or negative,
+   * smaller or larger than the total number of points.
+   * @param {number} i The index to retrieve.
+   * @returns {number}
+   */
+  index(i) {
+    return (i + this.points.length) % this.points.length;
+  }
+
+  /**
+   * Get the ith point in the path order.
+   * @param {*} i The index to retrieve. 
+   */
+  access(i) {
+    return this.points[this.order[this.index(i)]];
+  }  
+
+  /**
+   * Access the cached distance between two points, by their indices.
+   * @param {number} i The first index as an integer
+   * @param {number} j The second index as an integer
+   * @returns {number} The distance between point i and point j.
+   */
+  distance(i, j) {
+    if (i === j) return 0; // Identity.
+
+    // Ensure low is actually lower.
+    let low = this.order[i], high = this.order[j];
+    if (low > high) { low = this.order[j]; high = this.order[i]; }
+
+    return this.distances[low * this.points.length + high] || 0;
+  }
+
+  /**
+   * Retrieve a random index between 1 and the last position in the array of points.
+   * @returns {number} A random index.
+   */
+  randomPos() {
+    return 1 + Math.floor(Math.random() * (this.points.length - 1));
+  };
+}
+
+
 
 /**
  * Represents a point in two dimensions. Used as the input for `solve`.
@@ -147,9 +162,11 @@ Path.prototype.randomPos = function() {
  * @param {number} x abscissa
  * @param {number} y ordinate
  */
-function Point(x, y) {
-  this.x = x;
-  this.y = y;
+class Point {
+  constructor(x, y) {
+    this.x = x;
+    this.y = y;    
+  }
 };
 
 /**
@@ -166,16 +183,16 @@ function Point(x, y) {
  * @returns {number[]} An array of indexes in the original array. Indicates in which order the different points are visited.
  *
  * @example
- * var points = [
+ * const points = [
  *       new salesman.Point(2,3)
  *       //other points
  *     ];
- * var solution = salesman.solve(points);
- * var ordered_points = solution.map(i => points[i]);
+ * const solution = salesman.solve(points);
+ * const ordered_points = solution.map(i => points[i]);
  * // ordered_points now contains the points, in the order they ought to be visited.
  **/
 function solve(points, temp_coeff = 0.999, callback, distance = euclidean) {
-  var path = new Path(points, distance);
+  const path = new Path(points, distance);
   // Optimization: If there is only one point in the list, there is no path.
   if (points.length < 2) return path.order;
   // Optimization: If the user would provide a bad input, end immediately.
@@ -184,9 +201,9 @@ function solve(points, temp_coeff = 0.999, callback, distance = euclidean) {
   // Create a temperature coefficient.
   if (!temp_coeff)
     temp_coeff = 1 - Math.exp(-10 - Math.min(points.length,1e6)/1e5);
-  var hasCallback = typeof(callback) === "function";
+  const hasCallback = typeof(callback) === "function";
 
-  for (var temperature = 100 * distance(path.access(0), path.access(1));
+  for (let temperature = 100 * distance(path.access(0), path.access(1));
            temperature > 1e-6;
            temperature *= temp_coeff) {
     path.change(temperature);
@@ -204,7 +221,7 @@ function solve(points, temp_coeff = 0.999, callback, distance = euclidean) {
  * @returns {number} The Euclidean distance between p and q
  */
 function euclidean(p, q) {
-  var dx = p.x - q.x, dy = p.y - q.y;
+  const dx = p.x - q.x, dy = p.y - q.y;
   return Math.sqrt(dx*dx + dy*dy);
 }
 
