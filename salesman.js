@@ -80,6 +80,7 @@ Path.prototype.randomPos = function() {
  * @param {Point[]} points The points that the path will have to visit.
  * @param {Number} [temp_coeff=0.999] changes the convergence speed of the algorithm: the closer to 1, the slower the algorithm and the better the solutions.
  * @param {Function} [callback=] An optional callback to be called after each iteration.
+ * @param {function(Point, Point):number} distanceFn Optionally override the method used to calculate distance between two Points.
  *
  * @returns {Number[]} An array of indexes in the original array. Indicates in which order the different points are visited.
  *
@@ -92,14 +93,14 @@ Path.prototype.randomPos = function() {
  * var ordered_points = solution.map(i => points[i]);
  * // ordered_points now contains the points, in the order they ought to be visited.
  **/
-function solve(points, temp_coeff, callback) {
+function solve(points, temp_coeff, callback, distanceFn = distance) {
   var path = new Path(points);
   if (points.length < 2) return path.order; // There is nothing to optimize
   if (!temp_coeff)
     temp_coeff = 1 - Math.exp(-10 - Math.min(points.length,1e6)/1e5);
   var has_callback = typeof(callback) === "function";
 
-  for (var temperature = 100 * distance(path.access(0), path.access(1));
+  for (var temperature = 100 * distanceFn(path.access(0), path.access(1));
            temperature > 1e-6;
            temperature *= temp_coeff) {
     path.change(temperature);
@@ -119,6 +120,11 @@ function Point(x, y) {
   this.y = y;
 };
 
+/**
+ * Get distance between points
+ * @param {Point} p origin point
+ * @param {Point} q destination point
+ */
 function distance(p, q) {
   var dx = p.x - q.x, dy = p.y - q.y;
   return Math.sqrt(dx*dx + dy*dy);
