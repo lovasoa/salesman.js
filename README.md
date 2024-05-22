@@ -11,7 +11,7 @@ Good heuristic for the traveling salesman problem using simulated annealing.
 * [salesman](#module_salesman)
     * [~Point](#module_salesman..Point)
         * [new Point(x, y)](#new_module_salesman..Point_new)
-    * [~solve(points, [temp_coeff], [callback], [callback])](#module_salesman..solve) ⇒ <code>Array.&lt;number&gt;</code>
+    * [~solve(points, [temp_coeff], [callback], [callback], [keep_end])](#module_salesman..solve) ⇒ <code>Array.&lt;number&gt;</code>
 
 <a name="module_salesman..Point"></a>
 
@@ -30,7 +30,7 @@ Represents a point in two dimensions. Used as the input for `solve`.
 
 <a name="module_salesman..solve"></a>
 
-### salesman~solve(points, [temp_coeff], [callback], [callback]) ⇒ <code>Array.&lt;number&gt;</code>
+### salesman~solve(points, [temp_coeff], [callback], [callback], [keep_end]) ⇒ <code>Array.&lt;number&gt;</code>
 Solves the following problem:
  Given a list of points and the distances between each pair of points,
  what is the shortest possible route that visits each point exactly
@@ -45,6 +45,7 @@ Solves the following problem:
 | [temp_coeff] | <code>number</code> | <code>0.999</code> | changes the convergence speed of the algorithm. Smaller values (0.9) work faster but give poorer solutions, whereas values closer to 1 (0.99999) work slower, but give better solutions. |
 | [callback] | <code>function</code> |  | An optional callback to be called after each iteration. |
 | [callback] | <code>function</code> | <code>euclidean</code> | An optional argument to specify how distances are calculated. The function takes two Point objects as arguments and returns a number for distance. Defaults to simple Euclidean distance calculation. |
+| [keep_end] | <code>boolean</code> | <code>false</code> | An optional argument to specify if the last point is fixed. If false then the minimum circuit is calculated, if true the minimum path from first to last node is calculated. |
 
 **Example**  
 ```js
