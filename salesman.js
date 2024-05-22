@@ -17,10 +17,12 @@
  * along with an array which maintains a record of distances between points.
  * @param {Points[]} points The points in the path.
  * @param {Function} distanceFunc The function to use to calculate the distance between two points.
+ * @param {boolean} keepEnd Specify if the last point is fixed. If false then the minimum circuit is calculated, if true the minimum path from first to last node is calculated.
  */
-function Path(points, distanceFunc) {
+function Path(points, distanceFunc, keepEnd) {
   this.points = points;
   this.distanceFunc = distanceFunc;
+  this.keepEnd = keepEnd;
   this.initializeOrder();
   this.initializeDistances();
 }
@@ -138,7 +140,7 @@ Path.prototype.distance = function(i, j) {
  * @returns {number} A random index.
  */
 Path.prototype.randomPos = function() {
-  return 1 + Math.floor(Math.random() * (this.points.length - 1));
+  return 1 + Math.floor(Math.random() * (this.points.length - (this.keepEnd ? 2 : 1)));
 };
 
 /**
@@ -174,8 +176,8 @@ function Point(x, y) {
  * var ordered_points = solution.map(i => points[i]);
  * // ordered_points now contains the points, in the order they ought to be visited.
  **/
-function solve(points, temp_coeff = 0.999, callback, distance = euclidean) {
-  var path = new Path(points, distance);
+function solve(points, temp_coeff = 0.999, callback, distance = euclidean, keep_end = false) {
+  var path = new Path(points, distance, keep_end);
   // Optimization: If there is only one point in the list, there is no path.
   if (points.length < 2) return path.order;
   // Optimization: If the user would provide a bad input, end immediately.
